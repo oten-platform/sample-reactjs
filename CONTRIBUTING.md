@@ -7,8 +7,8 @@ Thank you for your interest in contributing to this project! This document provi
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/your-username/oten-auth-react.git
-   cd oten-auth-react
+   git clone https://github.com/oten-platform/sample-reactjs.git
+   cd sample-reactjs
    ```
 3. **Install dependencies**:
    ```bash
@@ -88,4 +88,3 @@ By contributing, you agree that your contributions will be licensed under the sa
 ---
 
 Thank you for contributing! 🎉
-

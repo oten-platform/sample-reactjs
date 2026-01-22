@@ -56,7 +56,7 @@ Before you begin, ensure you have the following installed:
 
 ```bash
 git clone <repository-url>
-cd oten-auth-react
+cd sample-reactjs
 ```
 
 ### 2. Install Dependencies
@@ -70,7 +70,6 @@ npm install
 1. Log in to your [Oten IDP Dashboard](https://developer.oten.live)
 2. Create a new application or select an existing one
 3. Configure the following settings:
-
    - **Application Type**: Single Page Application (SPA)
    - **Allowed Callback URLs**: `http://localhost:5173`
    - **Allowed Logout URLs**: `http://localhost:5173`
@@ -136,9 +135,8 @@ The OIDC settings are configured in `src/main.tsx`:
 const oidcSettings: UserManagerSettings = {
   authority: import.meta.env.VITE_OTEN_IDP_AUTH_DOMAIN,
   client_id: import.meta.env.VITE_OTEN_IDP_CLIENT_ID,
-  redirect_uri: import.meta.env.VITE_REDIRECT_URI || window.location.origin,
-  post_logout_redirect_uri:
-    import.meta.env.VITE_POST_LOGOUT_REDIRECT_URI || window.location.origin,
+  redirect_uri: window.location.origin,
+  post_logout_redirect_uri: window.location.origin,
   scope: "openid profile email",
 };
 ```
@@ -146,7 +144,7 @@ const oidcSettings: UserManagerSettings = {
 ## 📂 Project Structure
 
 ```
-oten-auth-react/
+sample-reactjs/
 ├── src/
 │   ├── components/
 │   │   ├── LoginButton.tsx      # Login button component
