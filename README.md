@@ -67,17 +67,17 @@ npm install
 
 ### 3. Configure Oten IDP Application
 
-1. Log in to your [Oten IDP Dashboard](https://developer.oten.live)
+1. Log in to your [Oten Developer Portal](https://developer.oten.live)
 2. Create a new application or select an existing one
 3. Configure the following settings:
    - **Application Type**: Single Page Application (SPA)
-   - **Allowed Callback URLs**: `http://localhost:5173`
-   - **Allowed Logout URLs**: `http://localhost:5173`
-   - **Allowed Web Origins**: `http://localhost:5173`
+   - **Redirect URIs**: `http://localhost:5173`
+   - **Logout URIs**: `http://localhost:5173`
+   - **Allow Origins (CORS):**: `http://localhost:5173`
    - **Allowed Scopes**: `openid`, `profile`, `email`
 
 4. Save your configuration and note your:
-   - **Authority URL** (e.g., `https://account.oten.live/`)
+   - **Authority URL** (`https://account.oten.live/`)
    - **Client ID**
 
 ### 4. Set Up Environment Variables
@@ -87,14 +87,6 @@ Create a `.env` file in the project root:
 ```bash
 VITE_OTEN_IDP_AUTH_DOMAIN=https://account.oten.live/
 VITE_OTEN_IDP_CLIENT_ID=your_client_id_here
-```
-
-**Optional environment variables:**
-
-```bash
-# Custom redirect URIs (defaults to window.location.origin)
-VITE_REDIRECT_URI=http://localhost:5173
-VITE_POST_LOGOUT_REDIRECT_URI=http://localhost:5173
 ```
 
 > ⚠️ **Important**: Never commit your `.env` file to version control. Add it to `.gitignore`.
@@ -120,12 +112,10 @@ The application will start at **http://localhost:5173**
 
 ### Environment Variables
 
-| Variable                        | Required | Description                      | Example                      |
-| ------------------------------- | -------- | -------------------------------- | ---------------------------- |
-| `VITE_OTEN_IDP_AUTH_DOMAIN`     | ✅ Yes   | Your Oten IDP authority URL      | `https://account.oten.live/` |
-| `VITE_OTEN_IDP_CLIENT_ID`       | ✅ Yes   | Your application's client ID     | `abc123xyz...`               |
-| `VITE_REDIRECT_URI`             | ❌ No    | Custom redirect URI after login  | `http://localhost:5173`      |
-| `VITE_POST_LOGOUT_REDIRECT_URI` | ❌ No    | Custom redirect URI after logout | `http://localhost:5173`      |
+| Variable                    | Required | Description                  | Example                      |
+| --------------------------- | -------- | ---------------------------- | ---------------------------- |
+| `VITE_OTEN_IDP_AUTH_DOMAIN` | ✅ Yes   | Oten IDP authority URL       | `https://account.oten.live/` |
+| `VITE_OTEN_IDP_CLIENT_ID`   | ✅ Yes   | Your application's client ID | `abc123xyz...`               |
 
 ### OIDC Configuration
 
@@ -314,11 +304,11 @@ function MyComponent() {
 
 #### **"Redirect URI mismatch" Error**
 
-**Problem**: The redirect URI doesn't match what's configured in Oten IDP.
+**Problem**: The redirect URI doesn't match what's configured in Oten Developer Portal.
 
 **Solution**:
 
-- Verify `VITE_REDIRECT_URI` matches exactly what's in your Oten IDP dashboard
+- Verify `VITE_REDIRECT_URI` matches exactly what's in your Oten Developer Portal dashboard
 - Include the protocol (`http://` or `https://`)
 - Don't include trailing slashes unless configured that way
 - For development, use `http://localhost:5173`
@@ -330,7 +320,7 @@ function MyComponent() {
 **Solution**:
 
 - Double-check `VITE_OTEN_IDP_CLIENT_ID` in your `.env` file
-- Ensure the client is enabled in Oten IDP dashboard
+- Ensure the client is enabled in Oten Developer Portal dashboard
 - Verify the client is configured for Authorization Code Flow
 
 #### **Session Lost on Page Refresh**
@@ -339,8 +329,8 @@ function MyComponent() {
 
 **Solution**:
 
-- Check browser console for localStorage errors
-- Verify localStorage is enabled in browser settings
+- Check browser console for sessionStorage errors
+- Verify sessionStorage is enabled in browser settings
 - Ensure cookies are enabled (required for OIDC)
 - Check that your domain is not blocking third-party cookies
 
@@ -350,7 +340,7 @@ function MyComponent() {
 
 **Solution**:
 
-- Ensure `http://localhost:5173` is added to Allowed Web Origins in Oten IDP
+- Ensure `http://localhost:5173` is added to Allow Origins (CORS) in Oten Developer Portal dashboard
 - Verify the authority URL is correct and accessible
 - Check CORS settings in your Oten IDP application
 
@@ -422,7 +412,7 @@ This sample application is provided as-is for educational and integration purpos
 
 - **Documentation**: [Oten IDP Documentation](https://oten.gitbook.io/idp-support/integration/integration-document)
 - **Need help**: [Oten IDP Support](https://oten.gitbook.io/idp-support/integration/integration-document#need-help)
-- **GitHub Issues**: [GitHub Issues](https://github.com/your-repo/issues)
+- **GitHub Issues**: [GitHub Issues](https://github.com/oten-platform/sample-reactjs/issues)
 
 ---
 
