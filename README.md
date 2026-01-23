@@ -165,8 +165,6 @@ sample-reactjs/
 │   │   ├── LoginButton.tsx      # Login button component
 │   │   ├── LogoutButton.tsx     # Logout button component
 │   │   └── Profile.tsx          # User profile display
-│   ├── hooks/
-│   │   └── use-auth.tsx         # Re-exports useAuth from react-oidc-context
 │   ├── App.tsx                  # Main app component
 │   ├── main.tsx                 # App entry point with AuthProvider setup
 │   └── index.css                # Global styles
@@ -182,30 +180,42 @@ sample-reactjs/
 ### Authentication Flow
 
 ```
-┌─────────┐                                  ┌──────────────┐
-│  User   │                                  │  Oten IDP    │
-└────┬────┘                                  └──────┬───────┘
-     │                                              │
-     │  1. Click "Log In"                          │
-     ├─────────────────────────────────────────────>
-     │                                              │
-     │  2. Redirect to /authorize (with PKCE)      │
-     │<─────────────────────────────────────────────┤
-     │                                              │
-     │  3. Enter credentials                        │
-     ├─────────────────────────────────────────────>
-     │                                              │
-     │  4. Redirect back with auth code             │
-     │<─────────────────────────────────────────────┤
-     │                                              │
-     │  5. Exchange code for tokens                 │
-     ├─────────────────────────────────────────────>
-     │                                              │
-     │  6. Return access_token & id_token           │
-     │<─────────────────────────────────────────────┤
-     │                                              │
-     │  7. Store tokens & show profile              │
-     │                                              │
+┌─────────┐              ┌──────────────┐              ┌──────────────┐
+│  User   │              │  React App   │              │  Oten IDP    │
+└────┬────┘              └──────┬───────┘              └──────┬───────┘
+     │                          │                             │
+     │  1. Click "Log In"       │                             │
+     ├─────────────────────────>│                             │
+     │                          │                             │
+     │                          │  2. Redirect to /authorize  │
+     │                          │     (with PKCE)             │
+     │                          ├────────────────────────────>│
+     │                          │                             │
+     │  3. Redirected to Oten IDP login page                  │
+     │<───────────────────────────────────────────────────────┤
+     │                          │                             │
+     │  4. Enter credentials    │                             │
+     ├────────────────────────────────────────────────────────>
+     │                          │                             │
+     │  5. Redirect back with auth code                       │
+     │<───────────────────────────────────────────────────────┤
+     │                          │                             │
+     │  6. Callback to app      │                             │
+     ├─────────────────────────>│                             │
+     │                          │                             │
+     │                          │  7. Exchange code for tokens│
+     │                          ├────────────────────────────>│
+     │                          │                             │
+     │                          │  8. Return access_token &   │
+     │                          │     id_token                │
+     │                          │<────────────────────────────┤
+     │                          │                             │
+     │                          │  9. Store tokens in         │
+     │                          │     sessionStorage          │
+     │                          │                             │
+     │  10. Show profile        │                             │
+     │<─────────────────────────┤                             │
+     │                          │                             │
 ```
 
 ### Key Components
@@ -221,11 +231,13 @@ The authentication provider from `react-oidc-context` that:
 - Handles authentication errors
 - Provides automatic token renewal
 
-#### **useAuth Hook** (`src/hooks/use-auth.tsx`)
+#### **useAuth Hook** (from `react-oidc-context`)
 
-Re-exports the `useAuth` hook from `react-oidc-context` that provides access to:
+Components import the `useAuth` hook directly from `react-oidc-context` to access authentication state and methods:
 
 ```typescript
+import { useAuth } from "react-oidc-context";
+
 const auth = useAuth();
 
 // Available properties:
