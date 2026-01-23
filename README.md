@@ -420,13 +420,13 @@ Open the browser console (F12) to see detailed logs:
 
 This sample implements several security best practices:
 
-✅ **Authorization Code Flow with PKCE** - Most secure OAuth flow for SPAs
-✅ **State Parameter** - CSRF protection (handled by react-oidc-context)
-✅ **Nonce Validation** - Replay attack protection (handled by react-oidc-context)
-✅ **Token Storage** - Tokens stored in sessionStorage (consider httpOnly cookies for production)
-✅ **HTTPS Required** - Always use HTTPS in production
-✅ **Error Handling** - Comprehensive error handling and user feedback
-✅ **Automatic Token Renewal** - Silent token refresh handled automatically
+- ✅ **Authorization Code Flow with PKCE** - Most secure OAuth flow for SPAs
+- ✅ **State Parameter** - CSRF protection (handled by react-oidc-context)
+- ✅ **Nonce Validation** - Replay attack protection (handled by react-oidc-context)
+- ✅ **Token Storage** - Tokens stored in sessionStorage (consider httpOnly cookies for production)
+- ✅ **HTTPS Required** - Always use HTTPS in production
+- ✅ **Error Handling** - Comprehensive error handling and user feedback
+- ✅ **Automatic Token Renewal** - Silent token refresh handled automatically
 
 ### Production Recommendations
 
