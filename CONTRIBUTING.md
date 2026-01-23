@@ -1,6 +1,6 @@
 # Contributing to Oten IDP React Sample
 
-Thank you for your interest in contributing to this project! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to this project! This sample demonstrates authentication with Oten IDP using `react-oidc-context`. This document provides guidelines and instructions for contributing.
 
 ## 🚀 Getting Started
 

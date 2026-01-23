@@ -3,7 +3,7 @@
 [![React](https://img.shields.io/badge/React-19.2.0-61dafb?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-7.2.4-646cff?logo=vite)](https://vitejs.dev/)
-[![OIDC Client](https://img.shields.io/badge/oidc--client--ts-3.4.1-green)](https://github.com/authts/oidc-client-ts)
+[![react-oidc-context](https://img.shields.io/badge/react--oidc--context-3.3.0-green)](https://github.com/authts/react-oidc-context)
 
 A sample React application demonstrating authentication with **Oten IDP** using OpenID Connect (OIDC) and OAuth 2.0.
 
@@ -14,12 +14,15 @@ A sample React application demonstrating authentication with **Oten IDP** using 
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
 - [Configuration](#configuration)
-- [Running the Application](#running-the-application)
 - [Project Structure](#project-structure)
 - [How It Works](#how-it-works)
 - [API Reference](#api-reference)
+- [Code Examples](#-code-examples)
 - [Troubleshooting](#troubleshooting)
-- [License](#license)
+- [Security Best Practices](#-security-best-practices)
+- [Available Scripts](#-available-scripts)
+- [Contributing](#-contributing)
+- [Support](#-support)
 
 ## 🎯 Overview
 
@@ -32,6 +35,17 @@ This sample application demonstrates how to:
 - ✅ Handle token expiration and session management
 - ✅ Make authenticated API calls using access tokens
 
+### Why react-oidc-context?
+
+This sample uses [`react-oidc-context`](https://github.com/authts/react-oidc-context), a lightweight React wrapper around `oidc-client-ts` that provides:
+
+- 🎯 **Simple API** - Clean React hooks interface (`useAuth()`)
+- 🔄 **Automatic Token Renewal** - Handles token refresh automatically
+- 📦 **Minimal Setup** - Just wrap your app with `<AuthProvider>`
+- 🛡️ **Type Safe** - Full TypeScript support out of the box
+- ⚡ **React-First** - Built specifically for React applications
+- 🧪 **Well Tested** - Battle-tested in production applications
+
 ## ✨ Features
 
 - **🔐 Secure Authentication** - OAuth 2.0 / OpenID Connect with PKCE
@@ -39,7 +53,7 @@ This sample application demonstrates how to:
 - **🎨 Beautiful UI** - Glassmorphism design with smooth animations
 - **🔄 Session Management** - Automatic token storage and expiration handling
 - **⚡ Fast Development** - Hot module replacement with Vite
-- **📦 Minimal Dependencies** - Only `oidc-client-ts` for authentication
+- **📦 Minimal Dependencies** - Uses `react-oidc-context` for seamless authentication
 - **🛡️ Type Safe** - Full TypeScript support
 
 ## 📦 Prerequisites
@@ -122,13 +136,24 @@ The application will start at **http://localhost:5173**
 The OIDC settings are configured in `src/main.tsx`:
 
 ```typescript
-const oidcSettings: UserManagerSettings = {
+import { AuthProvider, type AuthProviderProps } from 'react-oidc-context';
+
+const oidcConfig: AuthProviderProps = {
   authority: import.meta.env.VITE_OTEN_IDP_AUTH_DOMAIN,
   client_id: import.meta.env.VITE_OTEN_IDP_CLIENT_ID,
   redirect_uri: window.location.origin,
   post_logout_redirect_uri: window.location.origin,
-  scope: "openid profile email",
+  scope: 'openid profile email',
+  onSigninCallback: () => {
+    // Clean up URL after successful authentication
+    window.history.replaceState({}, document.title, window.location.pathname);
+  },
 };
+
+// Wrap your app with AuthProvider
+<AuthProvider {...oidcConfig}>
+  <App />
+</AuthProvider>
 ```
 
 ## 📂 Project Structure
@@ -141,11 +166,9 @@ sample-reactjs/
 │   │   ├── LogoutButton.tsx     # Logout button component
 │   │   └── Profile.tsx          # User profile display
 │   ├── hooks/
-│   │   └── use-auth.tsx         # Custom hook for auth context
-│   ├── providers/
-│   │   └── auth-provider.tsx    # Auth context provider
+│   │   └── use-auth.tsx         # Re-exports useAuth from react-oidc-context
 │   ├── App.tsx                  # Main app component
-│   ├── main.tsx                 # App entry point
+│   ├── main.tsx                 # App entry point with AuthProvider setup
 │   └── index.css                # Global styles
 ├── .env                         # Environment variables (create this)
 ├── package.json
@@ -187,46 +210,48 @@ sample-reactjs/
 
 ### Key Components
 
-#### **AuthProvider** (`src/providers/auth-provider.tsx`)
+#### **AuthProvider** (from `react-oidc-context`)
 
-The core authentication provider that:
+The authentication provider from `react-oidc-context` that:
 
-- Manages user authentication state
+- Manages user authentication state automatically
 - Handles login/logout flows
 - Processes OAuth callbacks
 - Manages token lifecycle
 - Handles authentication errors
+- Provides automatic token renewal
 
 #### **useAuth Hook** (`src/hooks/use-auth.tsx`)
 
-A custom React hook that provides access to:
+Re-exports the `useAuth` hook from `react-oidc-context` that provides access to:
 
 ```typescript
-const {
-  user, // Current user object (null if not authenticated)
-  isAuthenticated, // Boolean authentication status
-  isLoading, // Loading state during initialization
-  token, // Access token for API calls
-  error, // Authentication errors
-  loginWithRedirect, // Function to initiate login
-  logoutWithRedirect, // Function to initiate logout
-  clearError, // Function to clear error state
-} = useAuth();
+const auth = useAuth();
+
+// Available properties:
+auth.user; // Current user object (null if not authenticated)
+auth.isAuthenticated; // Boolean authentication status
+auth.isLoading; // Loading state during initialization
+auth.error; // Authentication errors
+auth.signinRedirect(); // Function to initiate login
+auth.signoutRedirect(); // Function to initiate logout
+auth.removeUser(); // Function to clear user state
 ```
 
 #### **Components**
 
-- **LoginButton** - Triggers the OAuth login flow
-- **LogoutButton** - Logs out the user and clears session
-- **Profile** - Displays authenticated user information
+- **LoginButton** - Triggers the OAuth login flow using `auth.signinRedirect()`
+- **LogoutButton** - Logs out the user using `auth.signoutRedirect()`
+- **Profile** - Displays authenticated user information from `auth.user`
 
-### Event Handlers
+### Automatic Features
 
-The application handles the following OIDC events:
+`react-oidc-context` automatically handles:
 
-- **`UserLoaded`** - Fires when user is successfully authenticated
-- **`AccessTokenExpired`** - Fires when the access token expires
-- **`SilentRenewError`** - Fires when automatic token renewal fails
+- **Token Storage** - Securely stores tokens in session/local storage
+- **Token Renewal** - Automatically renews tokens before expiration
+- **Callback Processing** - Handles OAuth callback parameters
+- **Error Management** - Provides error state for authentication failures
 
 ## 📚 API Reference
 
@@ -236,24 +261,28 @@ The application handles the following OIDC events:
 import { useAuth } from "./hooks/use-auth";
 
 function MyComponent() {
-  const { isAuthenticated, user, loginWithRedirect } = useAuth();
+  const auth = useAuth();
 
   // Use authentication state and methods
+  if (auth.isAuthenticated) {
+    console.log(auth.user);
+  }
 }
 ```
 
-#### Return Values
+#### Key Properties and Methods
 
-| Property             | Type                  | Description                       |
-| -------------------- | --------------------- | --------------------------------- |
-| `user`               | `User \| null`        | Current authenticated user object |
-| `isAuthenticated`    | `boolean`             | Whether user is authenticated     |
-| `isLoading`          | `boolean`             | Whether auth is initializing      |
-| `token`              | `string \| null`      | Access token for API calls        |
-| `error`              | `Error \| undefined`  | Any authentication error          |
-| `loginWithRedirect`  | `() => Promise<void>` | Initiates login flow              |
-| `logoutWithRedirect` | `() => Promise<void>` | Initiates logout flow             |
-| `clearError`         | `() => void`          | Clears error state                |
+| Property/Method     | Type                  | Description                       |
+| ------------------- | --------------------- | --------------------------------- |
+| `user`              | `User \| null`        | Current authenticated user object |
+| `isAuthenticated`   | `boolean`             | Whether user is authenticated     |
+| `isLoading`         | `boolean`             | Whether auth is initializing      |
+| `error`             | `Error \| undefined`  | Any authentication error          |
+| `signinRedirect()`  | `() => Promise<void>` | Initiates login flow              |
+| `signoutRedirect()` | `() => Promise<void>` | Initiates logout flow             |
+| `removeUser()`      | `() => Promise<void>` | Removes user from storage         |
+| `signinSilent()`    | `() => Promise<void>` | Silently renews authentication    |
+| `activeNavigator`   | `string`              | Current navigation state          |
 
 ### User Object
 
@@ -278,14 +307,14 @@ function MyComponent() {
 import { useAuth } from "./hooks/use-auth";
 
 function MyComponent() {
-  const { token, isAuthenticated } = useAuth();
+  const auth = useAuth();
 
   const fetchProtectedData = async () => {
-    if (!isAuthenticated || !token) return;
+    if (!auth.isAuthenticated || !auth.user) return;
 
     const response = await fetch("https://api.example.com/protected", {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${auth.user.access_token}`,
         "Content-Type": "application/json",
       },
     });
@@ -322,6 +351,18 @@ function MyComponent() {
 - Double-check `VITE_OTEN_IDP_CLIENT_ID` in your `.env` file
 - Ensure the client is enabled in Oten Developer Portal dashboard
 - Verify the client is configured for Authorization Code Flow
+
+#### **"No matching state found in storage" Error**
+
+**Problem**: Authentication fails with state mismatch error after redirect.
+
+**Solution**:
+
+- Clear browser storage (Application → Storage → Clear site data in DevTools)
+- Ensure `onSigninCallback` is properly configured in `src/main.tsx`
+- Verify you're not using `matchSignoutCallback` incorrectly
+- Try in incognito/private mode to rule out storage issues
+- Check that cookies and sessionStorage are enabled
 
 #### **Session Lost on Page Refresh**
 
@@ -368,11 +409,12 @@ Open the browser console (F12) to see detailed logs:
 This sample implements several security best practices:
 
 ✅ **Authorization Code Flow with PKCE** - Most secure OAuth flow for SPAs
-✅ **State Parameter** - CSRF protection (handled by oidc-client-ts)
-✅ **Nonce Validation** - Replay attack protection (handled by oidc-client-ts)
+✅ **State Parameter** - CSRF protection (handled by react-oidc-context)
+✅ **Nonce Validation** - Replay attack protection (handled by react-oidc-context)
 ✅ **Token Storage** - Tokens stored in sessionStorage (consider httpOnly cookies for production)
 ✅ **HTTPS Required** - Always use HTTPS in production
 ✅ **Error Handling** - Comprehensive error handling and user feedback
+✅ **Automatic Token Renewal** - Silent token refresh handled automatically
 
 ### Production Recommendations
 
@@ -383,6 +425,116 @@ This sample implements several security best practices:
 5. **Session Monitoring** - Track and monitor active user sessions
 6. **Rate Limiting** - Implement rate limiting on authentication endpoints
 7. **Audit Logging** - Log authentication events for security monitoring
+
+## 💻 Code Examples
+
+### Complete Component Examples
+
+#### Login Button
+
+```typescript
+import { useAuth } from "react-oidc-context";
+
+const LoginButton = () => {
+  const { signinRedirect } = useAuth();
+
+  return (
+    <button onClick={() => signinRedirect()} className="button login">
+      Log In
+    </button>
+  );
+};
+```
+
+#### Logout Button
+
+```typescript
+import { useAuth } from "react-oidc-context";
+
+const LogoutButton = () => {
+  const { signoutRedirect } = useAuth();
+
+  return (
+    <button onClick={() => signoutRedirect()} className="button logout">
+      Log Out
+    </button>
+  );
+};
+```
+
+#### Profile Component
+
+```typescript
+import { useAuth } from "react-oidc-context";
+
+const Profile = () => {
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading profile...</div>;
+  }
+
+  if (!isAuthenticated || !user) return null;
+
+  return (
+    <div>
+      <img src={user.profile.picture} alt={user.profile.name} />
+      <h2>{user.profile.name}</h2>
+      <p>{user.profile.email}</p>
+    </div>
+  );
+};
+```
+
+#### Protected Route Example
+
+```typescript
+import { useAuth } from "react-oidc-context";
+
+const ProtectedComponent = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <div>Please log in to view this content.</div>;
+  }
+
+  return <div>Protected content here!</div>;
+};
+```
+
+#### Error Handling Example
+
+```typescript
+import { useAuth } from "react-oidc-context";
+
+function App() {
+  const { error, isLoading, signinRedirect, removeUser } = useAuth();
+
+  if (error) {
+    return (
+      <div>
+        <h1>Authentication Error</h1>
+        <p>{error.message}</p>
+        <button onClick={async () => {
+          await removeUser();
+          window.location.href = '/';
+        }}>
+          Dismiss
+        </button>
+        <button onClick={() => signinRedirect()}>
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  // Rest of your app...
+}
+```
 
 ## 📜 Available Scripts
 

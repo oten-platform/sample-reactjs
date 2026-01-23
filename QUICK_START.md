@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Get your Oten IDP React app running in 5 minutes! ⚡
+Get your Oten IDP React app running in 5 minutes using `react-oidc-context`! ⚡
 
 ## ✅ Prerequisites Checklist
 

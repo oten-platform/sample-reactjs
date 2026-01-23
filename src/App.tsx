@@ -1,10 +1,10 @@
+import { useAuth } from 'react-oidc-context';
 import LoginButton from './components/LoginButton';
 import LogoutButton from './components/LogoutButton';
 import Profile from './components/Profile';
-import { useAuth } from './hooks/use-auth';
 
 function App() {
-  const { isAuthenticated, isLoading, error, clearError, loginWithRedirect } = useAuth();
+  const { isAuthenticated, isLoading, error, signinRedirect, removeUser } = useAuth();
 
   if (isLoading) {
     return (
@@ -25,14 +25,17 @@ function App() {
             <h1 className="error-title">Authentication Error</h1>
             <p className="error-message">{error.message}</p>
             <div className="error-actions">
-              <button onClick={clearError} className="button logout">
+              <button
+                onClick={async () => {
+                  await removeUser();
+                  window.location.href = '/';
+                }}
+                className="button logout"
+              >
                 Dismiss
               </button>
               <button
-                onClick={() => {
-                  clearError();
-                  loginWithRedirect();
-                }}
+                onClick={() => signinRedirect()}
                 className="button login"
               >
                 Try Again

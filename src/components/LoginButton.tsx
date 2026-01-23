@@ -1,11 +1,11 @@
-import { useAuth } from "../hooks/use-auth";
+import { useAuth } from "react-oidc-context";
 
 const LoginButton = () => {
-    const { loginWithRedirect } = useAuth();
+    const { signinRedirect } = useAuth();
 
     return (
         <button
-            onClick={loginWithRedirect}
+            onClick={() => signinRedirect()}
             className="button login"
         >
             Log In

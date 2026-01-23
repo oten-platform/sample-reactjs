@@ -1,11 +1,11 @@
-import { useAuth } from "../hooks/use-auth";
+import { useAuth } from "react-oidc-context";
 
 const LogoutButton = () => {
-    const { logoutWithRedirect } = useAuth();
+    const { signoutRedirect } = useAuth();
 
     return (
         <button
-            onClick={logoutWithRedirect}
+            onClick={() => signoutRedirect()}
             className="button logout"
         >
             Log Out

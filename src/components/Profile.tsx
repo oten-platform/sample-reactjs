@@ -1,4 +1,4 @@
-import { useAuth } from "../hooks/use-auth";
+import { useAuth } from "react-oidc-context";
 
 const Profile = () => {
     const { user, isAuthenticated, isLoading } = useAuth();
